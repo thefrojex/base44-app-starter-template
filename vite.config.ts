@@ -2,11 +2,21 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+const hmrClientPort = process.env.VITE_HMR_CLIENT_PORT
+  ? Number(process.env.VITE_HMR_CLIENT_PORT)
+  : undefined;
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     allowedHosts: true,
+    hmr: {
+      protocol: process.env.VITE_HMR_PROTOCOL === "wss" ? "wss" : "ws",
+      host: process.env.VITE_HMR_HOST,
+      clientPort: Number.isFinite(hmrClientPort) ? hmrClientPort : undefined,
+      path: process.env.VITE_HMR_PATH,
+    },
   },
   resolve: {
     alias: {
