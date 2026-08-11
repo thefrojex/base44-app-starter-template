@@ -16,11 +16,13 @@ Never run `npm run dev`, `vite`, or start/restart any server. The platform start
 
 Never print, log, or include environment variables or secrets in code, comments, commits, or output.
 
-Use the Supabase CLI for schema and edge-function changes. Never hardcode Supabase credentials or service-role keys in source files.
+Use the Supabase CLI for schema and edge-function changes. When a task requires schema changes, create the migration and apply it to the remote database before stopping. Never leave a task at "migration created" without running the required migration. Never hardcode Supabase credentials or service-role keys in source files.
+
+Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run.
 
 For every new table in the `public` schema, enable row level security and add explicit least-privilege policies. Browser code uses the anon key, so do not rely on disabled RLS. For public/read-only demo or health-check data, add an explicit anon `SELECT` policy. For user-owned data, include `user_id uuid references auth.users(id)` and authenticated owner policies for `SELECT`, `INSERT`, `UPDATE`, and `DELETE`.
 
-Allowed shell commands are intentionally limited. Use `npm install`/`npm uninstall` for dependency changes, `git add`/`git commit` for meaningful checkpoints, and Supabase CLI commands such as `supabase migration new`, `supabase db push`, or `supabase functions deploy` for backend changes. Do not use raw network tools such as `curl` or `wget`, destructive commands such as `rm -rf`, privilege/permission commands such as `sudo` or `chmod`, or commands outside `/workspace`.
+Allowed shell commands are intentionally limited. Use `npm install`/`npm uninstall` for dependency changes, `git add`/`git commit` for meaningful checkpoints, and Supabase CLI commands such as `supabase migration new`, `supabase db push --yes`, or `supabase functions deploy` for backend changes. Do not use raw network tools such as `curl` or `wget`, destructive commands such as `rm -rf`, privilege/permission commands such as `sudo` or `chmod`, or commands outside `/workspace`.
 
 Commit changes with a clear message per meaningful change.
 
