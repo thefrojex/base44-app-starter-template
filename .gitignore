@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Per-sandbox OpenCode state/config. This is archived by the platform, not committed.
+.opencode-data/
+opencode.json
+
+# Supabase local/link state. Keep migrations and functions tracked.
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
