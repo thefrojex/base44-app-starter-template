@@ -11,6 +11,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     allowedHosts: true,
+    watch: {
+      ignored: ["**/.opencode-data/**"],
+    },
     hmr: {
       protocol: process.env.VITE_HMR_PROTOCOL === "wss" ? "wss" : "ws",
       host: process.env.VITE_HMR_HOST,
