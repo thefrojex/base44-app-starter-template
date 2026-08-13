@@ -8,7 +8,17 @@ Use the Supabase client from `src/lib/supabase.ts` for all data access. Use TanS
 
 Run `npm install` after any change to `package.json`.
 
-After changing React, TypeScript, routing, data access, or build configuration code, run `npm run build` before stopping. If the build reports syntax, TypeScript, import, or Vite errors, fix those errors and rerun `npm run build` until it passes.
+Treat incoming requests as product-level intent. The caller should describe what the app should do, how the UI and flow should behave, what data should be shown or saved, and what constraints to preserve. You are responsible for inspecting the existing codebase and deciding which files, components, routes, styles, Supabase migrations, queries, or dependencies must change to satisfy the requested app behavior.
+
+Do not require the caller to name files or implementation details. Do not blindly follow file-level assumptions from the caller unless the user explicitly requested those details. For UI changes, inspect the rendered app entry points first and choose the correct files based on the current code.
+
+When a request mentions a desired app flow, implement the full user-facing flow, including relevant screens or states, navigation, loading states, empty states, error states, success states, validation, and data persistence where appropriate.
+
+Before stopping, verify that the implemented app behavior matches the original user request. Re-read the request and check the visible UI, app flow, data behavior, and important states. If the implementation does not satisfy the requested behavior, fix it before stopping.
+
+After changing React, TypeScript, routing, data access, Supabase client usage, migrations, dependencies, or build configuration code, run `npm run build` before stopping. If the build reports syntax, TypeScript, import, dependency, or Vite errors, fix those errors and rerun `npm run build` until it passes.
+
+Do not declare the task complete only because files were edited. The task is complete only when the requested user-facing behavior is implemented, the app builds successfully, and any required Supabase migrations have been created and applied with `supabase db push --yes`.
 
 Never ask for confirmation or pause for user input. This runs non-interactively from another agent, so make a reasonable default choice and proceed.
 
@@ -20,7 +30,7 @@ Never print, log, or include environment variables or secrets in code, comments,
 
 Use the Supabase CLI for schema and edge-function changes. When a task requires schema changes, create a new migration and apply it to the remote database before stopping. Never leave a task at "migration created" without running the required migration. Never hardcode Supabase credentials or service-role keys in source files.
 
-Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run.
+Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run. If migration push fails, fix the migration or schema issue and rerun `supabase db push --yes` until it succeeds.
 
 You may use `curl` only for public HTTP/HTTPS endpoint checks, such as verifying a public Supabase REST endpoint. Never use `curl` against localhost, private IPs, Docker network hosts, metadata IPs, or internal service names. Never print secrets, full authorization headers, or environment variable values in curl commands or output.
 
