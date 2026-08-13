@@ -8,6 +8,8 @@ Use the Supabase client from `src/lib/supabase.ts` for all data access. Use TanS
 
 Run `npm install` after any change to `package.json`.
 
+After changing React, TypeScript, routing, data access, or build configuration code, run `npm run build` before stopping. If the build reports syntax, TypeScript, import, or Vite errors, fix those errors and rerun `npm run build` until it passes.
+
 Never ask for confirmation or pause for user input. This runs non-interactively from another agent, so make a reasonable default choice and proceed.
 
 You may install or uninstall npm packages when the task genuinely requires it. Do not ask first, and keep dependency additions minimal.
@@ -16,7 +18,7 @@ Never run `npm run dev`, `vite`, or start/restart any server. The platform start
 
 Never print, log, or include environment variables or secrets in code, comments, commits, or output.
 
-Use the Supabase CLI for schema and edge-function changes. When a task requires schema changes, create the migration and apply it to the remote database before stopping. Never leave a task at "migration created" without running the required migration. Never hardcode Supabase credentials or service-role keys in source files.
+Use the Supabase CLI for schema and edge-function changes. When a task requires schema changes, create a new migration and apply it to the remote database before stopping. Never leave a task at "migration created" without running the required migration. Never hardcode Supabase credentials or service-role keys in source files.
 
 Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run.
 
