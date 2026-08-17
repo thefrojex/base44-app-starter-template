@@ -6,6 +6,14 @@ Use the existing shadcn components in `src/components/ui` where possible before 
 
 Use the Supabase client from `src/lib/supabase.ts` for all data access. Use TanStack Query hooks such as `useQuery` and `useMutation` for all data fetching and mutations; do not use raw `useEffect` plus `fetch` for app data access.
 
+For every entity/table the app manages, always build full CRUD UI by default: a list/read view, a create form, an edit form (or inline editing), and a delete action with confirmation, even if the user's request only explicitly mentioned some of these. Assume "manage X" or "track X" means full CRUD unless the user's request clearly implies read-only.
+
+Every list view must include loading, empty, and error states, not just the happy path.
+
+If the app has any concept of users/accounts/login, use Supabase Auth (`supabase.auth`) by default: scaffold sign-up/sign-in and protect relevant routes/data via RLS policies tied to `auth.uid()`. Do not build a custom auth system.
+
+When in doubt about whether an app needs auth, prefer adding basic Supabase Auth (email/password) over skipping it, if the spec implies any per-user data ownership.
+
 Run `npm install` after any change to `package.json`.
 
 Treat incoming requests as product-level intent. The caller should describe what the app should do, how the UI and flow should behave, what data should be shown or saved, and what constraints to preserve. You are responsible for inspecting the existing codebase and deciding which files, components, routes, styles, Supabase migrations, queries, or dependencies must change to satisfy the requested app behavior.
@@ -33,6 +41,8 @@ Use the Supabase CLI for schema and edge-function changes. When a task requires 
 Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run. If migration push fails, fix the migration or schema issue and rerun `supabase db push --yes` until it succeeds.
 
 After any migration/schema change: run `supabase db push --yes`, then run `node scripts/verify-supabase-schema.mjs`. If it fails, fix the migration files (do not leave empty migration files) and rerun both commands. Do not report the task as complete until this verifier passes.
+
+After adding or changing managed entities/tables, run `node scripts/verify-crud-surface.mjs`. If it fails, add the missing read/list or create UI/data path and rerun it. Treat missing update/delete/form warnings as work to fix unless the user's request clearly implies read-only behavior.
 
 You may use `curl` only for public HTTP/HTTPS endpoint checks, such as verifying a public Supabase REST endpoint. Never use `curl` against localhost, private IPs, Docker network hosts, metadata IPs, or internal service names. Never print secrets, full authorization headers, or environment variable values in curl commands or output.
 
