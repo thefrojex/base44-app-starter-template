@@ -6,14 +6,17 @@ const root = process.cwd();
 const migrationsDir = path.join(root, "supabase", "migrations");
 
 function readMigrationSql() {
-  if (!fs.existsSync(migrationsDir)) return "";
+  if (!fs.existsSync(migrationsDir)) return { sql: "", fileCount: 0 };
 
-  return fs
+  const files = fs
     .readdirSync(migrationsDir)
     .filter((file) => file.endsWith(".sql"))
-    .sort()
-    .map((file) => fs.readFileSync(path.join(migrationsDir, file), "utf8"))
-    .join("\n");
+    .sort();
+
+  return {
+    fileCount: files.length,
+    sql: files.map((file) => fs.readFileSync(path.join(migrationsDir, file), "utf8")).join("\n"),
+  };
 }
 
 function identifierPattern() {
@@ -83,12 +86,17 @@ function setFromRows(rows, index = 0) {
   return new Set(rows.map((row) => row[index]).filter(Boolean));
 }
 
-const sql = readMigrationSql();
+const { sql, fileCount } = readMigrationSql();
 const expected = getExpectedObjects(sql);
 
 if (!hasAnyExpected(expected)) {
-  console.log("Supabase schema verification skipped: no schema objects found in migrations.");
-  process.exit(0);
+  if (fileCount === 0) {
+    console.log("Supabase schema verification skipped: no migration files found.");
+    process.exit(0);
+  }
+
+  console.error("Supabase schema verification failed: migration files exist, but no schema objects were found. Do not leave empty/no-op migration files.");
+  process.exit(1);
 }
 
 const tableResult = runPsql("select table_name from information_schema.tables where table_schema = 'public';");
