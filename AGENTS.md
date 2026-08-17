@@ -32,6 +32,8 @@ Use the Supabase CLI for schema and edge-function changes. When a task requires 
 
 Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run. If migration push fails, fix the migration or schema issue and rerun `supabase db push --yes` until it succeeds.
 
+After any migration/schema change: run `supabase db push --yes`, then run `node scripts/verify-supabase-schema.mjs`. If it fails, fix the migration files (do not leave empty migration files) and rerun both commands. Do not report the task as complete until this verifier passes.
+
 You may use `curl` only for public HTTP/HTTPS endpoint checks, such as verifying a public Supabase REST endpoint. Never use `curl` against localhost, private IPs, Docker network hosts, metadata IPs, or internal service names. Never print secrets, full authorization headers, or environment variable values in curl commands or output.
 
 For every new table in the `public` schema, enable row level security and add explicit least-privilege policies. Browser code uses the anon key, so do not rely on disabled RLS. For public/read-only demo or health-check data, add an explicit anon `SELECT` policy. For user-owned data, include `user_id uuid references auth.users(id)` and authenticated owner policies for `SELECT`, `INSERT`, `UPDATE`, and `DELETE`.
