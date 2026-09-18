@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This project uses Vite, React, TypeScript, Tailwind CSS, shadcn/ui, Supabase, and TanStack Query. Do not change it to a different framework, styling system, component library, backend client, or data-fetching library.
+This project uses Vite, React, TypeScript, Tailwind CSS, shadcn/ui, Supabase, React Router, and TanStack Query. Do not change it to a different framework, styling system, component library, backend client, routing library, or data-fetching library.
 
 Use the existing shadcn components in `src/components/ui` where possible before adding new UI from scratch.
 
@@ -30,6 +30,8 @@ Never print, log, or include environment variables or secrets in code, comments,
 
 Use the Supabase CLI for schema and edge-function changes. When a task requires schema changes, create a new migration and apply it to the remote database before stopping. Never leave a task at "migration created" without running the required migration. Never hardcode Supabase credentials or service-role keys in source files.
 
+If the project already has Supabase tables (this is an edit to an existing app, not the first build), run `node scripts/inspect-supabase-schema.mjs` before writing a new migration. It prints the live schema: every table's columns, types, primary keys, foreign keys, RLS status, and policies, plus enums. Use that output, not assumptions from memory or from re-reading old migration files, to decide what the new migration should add, alter, or leave alone.
+
 Always run database migrations non-interactively with `supabase db push --yes`. Do not run `supabase db push` without `--yes`, because it prompts for confirmation and will block the non-interactive agent run. If migration push fails, fix the migration or schema issue and rerun `supabase db push --yes` until it succeeds.
 
 You may use `curl` only for public HTTP/HTTPS endpoint checks, such as verifying a public Supabase REST endpoint. Never use `curl` against localhost, private IPs, Docker network hosts, metadata IPs, or internal service names. Never print secrets, full authorization headers, or environment variable values in curl commands or output.
@@ -46,4 +48,8 @@ For visual UI changes, inspect `src/App.tsx` first because it usually controls t
 
 Prefer changing the rendered component's `className` or `style` over changing CSS variables when an existing class directly controls the visible UI. Before editing a CSS variable such as `--background`, verify that the visible component still uses the matching token.
 
-Make the smallest code change that visibly satisfies the user's request. Keep existing stack conventions: Vite, React, TypeScript, Tailwind CSS, shadcn/ui, Supabase, and TanStack Query. Do not introduce new frameworks or libraries without strong reason.
+Determine whether this is a first build or an edit before deciding how much to change. If `src/App.tsx` still contains the starter placeholder text ("Hello, this app is ready to be built"), this is the first build of a new app. If that placeholder is gone, this is an edit to an app that already exists.
+
+For a first build, do not minimize scope. Build a real navigation shell using React Router (`BrowserRouter` is already wired in `src/main.tsx`) with distinct routes for every separate area implied by the request, not a single screen or a `useState` tab toggle standing in for multiple pages. Always build the sidebar and navigation shell unless the request is clearly a single-page tool with no distinct sections (e.g., a landing page or a single form thing requiring single pages).
+
+For an edit to an existing app, make the smallest code change that visibly satisfies the user's request. Keep the existing navigation structure, routes, and stack conventions intact; do not restructure or rebuild pages that were not part of the request, and do not introduce new frameworks or libraries without strong reason.
