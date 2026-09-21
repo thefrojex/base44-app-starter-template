@@ -12,5 +12,12 @@ export type Database = {
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseSchema = import.meta.env.VITE_SUPABASE_SCHEMA;
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// This app's Supabase project is shared with every other app belonging to the same tenant
+// (one Supabase project per tenant, schema-per-app) - db.schema scopes every query this client
+// makes to this app's own schema, so it never sees or touches another app's tables. Every
+// migration must be schema-qualified to match (see AGENTS.md).
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  db: { schema: supabaseSchema },
+});
