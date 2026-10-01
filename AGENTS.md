@@ -14,6 +14,8 @@ If the app has any concept of users/accounts/login, use Supabase Auth (`supabase
 
 When in doubt about whether an app needs auth, prefer adding basic Supabase Auth (email/password) over skipping it, if the spec implies any per-user data ownership.
 
+This app is never served at its domain's root path - always build `${window.location.origin}${import.meta.env.BASE_URL}` (not bare `window.location.origin`) for any `redirectTo`/`emailRedirectTo` passed to `supabase.auth.resetPasswordForEmail`, `signUp`, `signInWithOtp`, or any other Supabase Auth call that sends a link in an email. `window.location.origin` alone drops the path this app is actually mounted under and sends the user to the platform's own root page instead of back into this app.
+
 Run `npm install` after any change to `package.json`.
 
 Treat incoming requests as product-level intent. The caller should describe what the app should do, how the UI and flow should behave, what data should be shown or saved, and what constraints to preserve. You are responsible for inspecting the existing codebase and deciding which files, components, routes, styles, Supabase migrations, queries, or dependencies must change to satisfy the requested app behavior.
