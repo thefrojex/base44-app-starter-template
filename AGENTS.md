@@ -14,7 +14,7 @@ If the app has any concept of users/accounts/login, use Supabase Auth (`supabase
 
 When in doubt about whether an app needs auth, prefer adding basic Supabase Auth (email/password) over skipping it, if the spec implies any per-user data ownership.
 
-This app is never served at its domain's root path - always build `${window.location.origin}${import.meta.env.BASE_URL}` (not bare `window.location.origin`) for any `redirectTo`/`emailRedirectTo` passed to `supabase.auth.resetPasswordForEmail`, `signUp`, `signInWithOtp`, or any other Supabase Auth call that sends a link in an email. `window.location.origin` alone drops the path this app is actually mounted under and sends the user to the platform's own root page instead of back into this app.
+This app is never served at its domain's root path - always build `${window.location.origin}${import.meta.env.BASE_URL}` (not bare `window.location.origin`) for any `redirectTo`/`emailRedirectTo` passed to `supabase.auth.resetPasswordForEmail`, `signUp`, `signInWithOtp`, or any other Supabase Auth call that sends a link in an email. `window.location.origin` alone drops the path this app is actually mounted under and sends the user to the platform's own root page instead of back into this app. This is enforced by a build check, not just this instruction: after adding or changing any such auth call, run `node scripts/verify-auth-redirect.mjs`. If it fails, fix the call to derive its redirect from `window.location` at runtime (directly, or via a local variable computed that way) and rerun it.
 
 Run `npm install` after any change to `package.json`.
 
